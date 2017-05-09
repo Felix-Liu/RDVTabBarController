@@ -63,7 +63,7 @@
     // Setup defaults
     
     //    [self setBackgroundColor:[UIColor colorWithRed:51/255.0 green:51/255.0 blue:51/255.0 alpha:1]];
-    [self setBackgroundColor:TabbarBackgroundColor];
+    [self setBackgroundColor:[UIColor whiteColor]];
     
     _title = @"";
     _titlePositionAdjustment = UIOffsetZero;
@@ -116,7 +116,7 @@
             titleAttributes = [self unselectedTitleAttributes];
         }
         
-        lineImage = [self imageFromColor:TabbarIndicaterColor];
+        lineImage = [self imageFromColor:[UIColor clearColor]];
         
     } else {
         image = [self unselectedImage];
@@ -288,7 +288,7 @@
 - (void)setBackgroundSelectedImage:(UIImage *)selectedImage withUnselectedImage:(UIImage *)unselectedImage {
     if (selectedImage && (selectedImage != [self selectedBackgroundImage])) {
         UIView* lineView = [self viewWithTag:10086];
-        lineView.backgroundColor = ButtonHue;
+        lineView.backgroundColor = [UIColor colorWithRed:227/255.0 green:38/255.0 blue:100/255.0 alpha:1];
         [self setSelectedBackgroundImage:selectedImage];
     }
     

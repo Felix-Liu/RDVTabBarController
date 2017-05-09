@@ -148,7 +148,7 @@
 - (RDVTabBar *)tabBar {
     if (!_tabBar) {
         _tabBar = [[RDVTabBar alloc] init];
-        [_tabBar setBackgroundColor:TabbarBackgroundColor];
+        [_tabBar setBackgroundColor:[UIColor whiteColor]];
         [_tabBar setAutoresizingMask:(UIViewAutoresizingFlexibleWidth|
                                       UIViewAutoresizingFlexibleTopMargin|
                                       UIViewAutoresizingFlexibleLeftMargin|
@@ -162,7 +162,7 @@
 - (UIView *)contentView {
     if (!_contentView) {
         _contentView = [[UIView alloc] init];
-        [_contentView setBackgroundColor:TabbarBackgroundColor];
+        [_contentView setBackgroundColor:[UIColor whiteColor]];
         [_contentView setAutoresizingMask:(UIViewAutoresizingFlexibleWidth|
                                            UIViewAutoresizingFlexibleHeight)];
     }

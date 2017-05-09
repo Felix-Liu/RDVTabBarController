@@ -56,14 +56,14 @@
 
 - (void)commonInitialization {
     
-    self.backgroundColor = TabbarBackgroundColor;
+    self.backgroundColor = [UIColor whiteColor];
     
     _backgroundView = [[UIView alloc] init];
-    _backgroundView.backgroundColor = TabbarBackgroundColor;
+    _backgroundView.backgroundColor = [UIColor whiteColor];
     [self addSubview:_backgroundView];
     
     _separatorView = [[UIView alloc] init];
-    _separatorView.backgroundColor = TabbarSeparatorColor;
+    _separatorView.backgroundColor = [UIColor colorWithRed:215/255.0 green:215/255.0 blue:218/255.0 alpha:1.0];
     [self addSubview:_separatorView];
     
     [self setTranslucent:NO];
@@ -175,7 +175,7 @@
 - (void)setTranslucent:(BOOL)translucent {
     _translucent = translucent;
     
-    [_backgroundView setBackgroundColor:TabbarBackgroundColor];
+    [_backgroundView setBackgroundColor:[UIColor whiteColor]];
 }
 
 @end
