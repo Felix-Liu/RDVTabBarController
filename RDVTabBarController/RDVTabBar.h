@@ -57,7 +57,7 @@
 @property (nonatomic, weak) RDVTabBarItem *selectedItem;
 
 /**
- * backgroundView stays behind tabBar's items. If you want to add additional views, 
+ * backgroundView stays behind tabBar's items. If you want to add additional views,
  * add them as subviews of backgroundView.
  */
 @property (nonatomic, readonly) UIView *backgroundView;
@@ -83,3 +83,4 @@
 @property (nonatomic, getter=isTranslucent) BOOL translucent;
 
 @end
+

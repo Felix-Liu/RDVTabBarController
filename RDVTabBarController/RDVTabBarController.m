@@ -57,28 +57,17 @@
     
     [self setTabBarHidden:self.isTabBarHidden animated:NO];
 }
--(void)viewDidLayoutSubviews{
-    [super viewDidLayoutSubviews];
-    [self setTabBarHidden:self.isTabBarHidden animated:NO];
 
-}
-
-- (UIStatusBarStyle)preferredStatusBarStyle {
-    return self.selectedViewController.preferredStatusBarStyle;
-}
-
-- (UIStatusBarAnimation)preferredStatusBarUpdateAnimation {
-    return self.selectedViewController.preferredStatusBarUpdateAnimation;
-}
-
-- (NSUInteger)supportedInterfaceOrientations {
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
     UIInterfaceOrientationMask orientationMask = UIInterfaceOrientationMaskAll;
+    
     for (UIViewController *viewController in [self viewControllers]) {
         if (![viewController respondsToSelector:@selector(supportedInterfaceOrientations)]) {
             return UIInterfaceOrientationMaskPortrait;
         }
         
-        UIInterfaceOrientationMask supportedOrientations = [viewController supportedInterfaceOrientations];
+        UIInterfaceOrientationMask supportedOrientations = (UIInterfaceOrientationMask)[viewController supportedInterfaceOrientations];
         
         if (orientationMask > supportedOrientations) {
             orientationMask = supportedOrientations;
@@ -123,19 +112,9 @@
     [[[self selectedViewController] view] setFrame:[[self contentView] bounds]];
     [[self contentView] addSubview:[[self selectedViewController] view]];
     [[self selectedViewController] didMoveToParentViewController:self];
-    
-    [self setNeedsStatusBarAppearanceUpdate];
 }
 
 - (void)setViewControllers:(NSArray *)viewControllers {
-    if (_viewControllers && _viewControllers.count) {
-        for (UIViewController *viewController in _viewControllers) {
-            [viewController willMoveToParentViewController:nil];
-            [viewController.view removeFromSuperview];
-            [viewController removeFromParentViewController];
-        }
-    }
-
     if (viewControllers && [viewControllers isKindOfClass:[NSArray class]]) {
         _viewControllers = [viewControllers copy];
         
@@ -169,7 +148,7 @@
 - (RDVTabBar *)tabBar {
     if (!_tabBar) {
         _tabBar = [[RDVTabBar alloc] init];
-        [_tabBar setBackgroundColor:[UIColor clearColor]];
+        [_tabBar setBackgroundColor:TabbarBackgroundColor];
         [_tabBar setAutoresizingMask:(UIViewAutoresizingFlexibleWidth|
                                       UIViewAutoresizingFlexibleTopMargin|
                                       UIViewAutoresizingFlexibleLeftMargin|
@@ -183,7 +162,7 @@
 - (UIView *)contentView {
     if (!_contentView) {
         _contentView = [[UIView alloc] init];
-        [_contentView setBackgroundColor:[UIColor whiteColor]];
+        [_contentView setBackgroundColor:TabbarBackgroundColor];
         [_contentView setAutoresizingMask:(UIViewAutoresizingFlexibleWidth|
                                            UIViewAutoresizingFlexibleHeight)];
     }
@@ -205,7 +184,7 @@
             tabBarHeight = 49;
         }
         
-        if (!weakSelf.tabBarHidden) {
+        if (!hidden) {
             tabBarStartingY = viewSize.height - tabBarHeight;
             if (![[weakSelf tabBar] isTranslucent]) {
                 contentViewHeight -= ([[weakSelf tabBar] minimumContentHeight] ?: tabBarHeight);
@@ -218,7 +197,7 @@
     };
     
     void (^completion)(BOOL) = ^(BOOL finished){
-        if (weakSelf.tabBarHidden) {
+        if (hidden) {
             [[weakSelf tabBar] setHidden:YES];
         }
     };
@@ -263,7 +242,8 @@
     if (index < 0 || index >= [[self viewControllers] count]) {
         return;
     }
-    
+    //12.17添加
+    self.navigationController.navigationBarHidden = NO;
     [self setSelectedIndex:index];
     
     if ([[self delegate] respondsToSelector:@selector(tabBarController:didSelectViewController:)]) {
@@ -277,7 +257,8 @@
 
 @implementation UIViewController (RDVTabBarControllerItemInternal)
 
-- (void)rdv_setTabBarController:(RDVTabBarController *)tabBarController {
+- (void)rdv_setTabBarController:(RDVTabBarController *)tabBarController
+{
     objc_setAssociatedObject(self, @selector(rdv_tabBarController), tabBarController, OBJC_ASSOCIATION_ASSIGN);
 }
 
@@ -317,3 +298,4 @@
 }
 
 @end
+

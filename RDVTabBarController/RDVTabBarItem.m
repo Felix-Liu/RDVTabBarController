@@ -62,7 +62,8 @@
 - (void)commonInitialization {
     // Setup defaults
     
-    [self setBackgroundColor:[UIColor clearColor]];
+    //    [self setBackgroundColor:[UIColor colorWithRed:51/255.0 green:51/255.0 blue:51/255.0 alpha:1]];
+    [self setBackgroundColor:TabbarBackgroundColor];
     
     _title = @"";
     _titlePositionAdjustment = UIOffsetZero;
@@ -86,9 +87,17 @@
     _badgeTextColor = [UIColor whiteColor];
     _badgeTextFont = [UIFont systemFontOfSize:12];
     _badgePositionAdjustment = UIOffsetZero;
+    
+    UIView* lineView = [[UIView alloc]init];
+    lineView.tag = 10086;
+    lineView.frame = CGRectMake(0, self.bounds.size.height - 3.0f, self.bounds.size.width, 3.0f);
+    lineView.frame = self.bounds;
+    lineView.backgroundColor = [UIColor redColor];
+    [self addSubview:lineView];
 }
 
-- (void)drawRect:(CGRect)rect {
+- (void)drawRect:(CGRect)rect
+{
     CGSize frameSize = self.frame.size;
     CGSize imageSize = CGSizeZero;
     CGSize titleSize = CGSizeZero;
@@ -96,6 +105,7 @@
     UIImage *backgroundImage = nil;
     UIImage *image = nil;
     CGFloat imageStartingY = 0.0f;
+    UIImage *lineImage = nil;
     
     if ([self isSelected]) {
         image = [self selectedImage];
@@ -105,10 +115,15 @@
         if (!titleAttributes) {
             titleAttributes = [self unselectedTitleAttributes];
         }
+        
+        lineImage = [self imageFromColor:TabbarIndicaterColor];
+        
     } else {
         image = [self unselectedImage];
         backgroundImage = [self unselectedBackgroundImage];
         titleAttributes = [self unselectedTitleAttributes];
+        
+        lineImage = [self imageFromColor:[UIColor clearColor]];
     }
     
     imageSize = [image size];
@@ -126,13 +141,15 @@
                                      roundf(frameSize.height / 2 - imageSize.height / 2) +
                                      _imagePositionAdjustment.vertical,
                                      imageSize.width, imageSize.height)];
+        
+        [lineImage drawInRect:CGRectMake(0, frameSize.height - 2.0f ,  frameSize.width, 2.0f)];
     } else {
         
         if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
             titleSize = [_title boundingRectWithSize:CGSizeMake(frameSize.width, 20)
-                                                    options:NSStringDrawingUsesLineFragmentOrigin
-                                                 attributes:titleAttributes
-                                                    context:nil].size;
+                                             options:NSStringDrawingUsesLineFragmentOrigin
+                                          attributes:@{NSFontAttributeName: titleAttributes[NSFontAttributeName]}
+                                             context:nil].size;
             
             imageStartingY = roundf((frameSize.height - imageSize.height - titleSize.height) / 2);
             
@@ -148,40 +165,12 @@
                                           imageStartingY + imageSize.height + _titlePositionAdjustment.vertical,
                                           titleSize.width, titleSize.height)
                 withAttributes:titleAttributes];
-        } else {
-#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-            titleSize = [_title sizeWithFont:titleAttributes[UITextAttributeFont]
-                           constrainedToSize:CGSizeMake(frameSize.width, 20)];
-            UIOffset titleShadowOffset = [titleAttributes[UITextAttributeTextShadowOffset] UIOffsetValue];
-            imageStartingY = roundf((frameSize.height - imageSize.height - titleSize.height) / 2);
-            
-            [image drawInRect:CGRectMake(roundf(frameSize.width / 2 - imageSize.width / 2) +
-                                         _imagePositionAdjustment.horizontal,
-                                         imageStartingY + _imagePositionAdjustment.vertical,
-                                         imageSize.width, imageSize.height)];
-            
-            CGContextSetFillColorWithColor(context, [titleAttributes[UITextAttributeTextColor] CGColor]);
-            
-            UIColor *shadowColor = titleAttributes[UITextAttributeTextShadowColor];
-            
-            if (shadowColor) {
-                CGContextSetShadowWithColor(context, CGSizeMake(titleShadowOffset.horizontal, titleShadowOffset.vertical),
-                                            1.0, [shadowColor CGColor]);
-            }
-            
-            [_title drawInRect:CGRectMake(roundf(frameSize.width / 2 - titleSize.width / 2) +
-                                          _titlePositionAdjustment.horizontal,
-                                          imageStartingY + imageSize.height + _titlePositionAdjustment.vertical,
-                                          titleSize.width, titleSize.height)
-                      withFont:titleAttributes[UITextAttributeFont]
-                 lineBreakMode:NSLineBreakByTruncatingTail];
-#endif
         }
     }
     
     // Draw badges
     
-    if ([[self badgeValue] integerValue] != 0) {
+    if ([[self badgeValue] length]) {
         CGSize badgeSize = CGSizeZero;
         
         if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
@@ -231,7 +220,7 @@
             [[self badgeValue] drawInRect:CGRectMake(CGRectGetMinX(badgeBackgroundFrame) + textOffset,
                                                      CGRectGetMinY(badgeBackgroundFrame) + textOffset,
                                                      badgeSize.width, badgeSize.height)
-                withAttributes:badgeTextAttributes];
+                           withAttributes:badgeTextAttributes];
         } else {
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
             [[self badgeValue] drawInRect:CGRectMake(CGRectGetMinX(badgeBackgroundFrame) + textOffset,
@@ -245,6 +234,17 @@
     }
     
     CGContextRestoreGState(context);
+}
+
+- (UIImage *)imageFromColor:(UIColor *)color{
+    CGRect rect = CGRectMake(0, 0, 1000, 1000);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return img;
 }
 
 #pragma mark - Image configuration
@@ -276,33 +276,27 @@
 #pragma mark - Background configuration
 
 - (UIImage *)backgroundSelectedImage {
+    
     return [self selectedBackgroundImage];
 }
 
 - (UIImage *)backgroundUnselectedImage {
+    
     return [self unselectedBackgroundImage];
 }
 
 - (void)setBackgroundSelectedImage:(UIImage *)selectedImage withUnselectedImage:(UIImage *)unselectedImage {
     if (selectedImage && (selectedImage != [self selectedBackgroundImage])) {
+        UIView* lineView = [self viewWithTag:10086];
+        lineView.backgroundColor = ButtonHue;
         [self setSelectedBackgroundImage:selectedImage];
     }
     
     if (unselectedImage && (unselectedImage != [self unselectedBackgroundImage])) {
+        UIView* lineView = [self viewWithTag:10086];
+        lineView.backgroundColor = [UIColor clearColor];
         [self setUnselectedBackgroundImage:unselectedImage];
     }
 }
-
-#pragma mark - Accessibility
-
-- (NSString *)accessibilityLabel{
-    return @"tabbarItem";
-}
-
-- (BOOL)isAccessibilityElement
-{
-    return YES;
-}
-
 
 @end

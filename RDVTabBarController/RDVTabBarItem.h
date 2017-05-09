@@ -79,6 +79,7 @@
  */
 - (void)setFinishedSelectedImage:(UIImage *)selectedImage withFinishedUnselectedImage:(UIImage *)unselectedImage;
 
+
 #pragma mark - Background configuration
 
 /**
@@ -106,26 +107,27 @@
 /**
  * Image used for background of badge.
  */
-@property (strong) UIImage *badgeBackgroundImage;
+@property (strong,strong) UIImage *badgeBackgroundImage;
 
 /**
  * Color used for badge's background.
  */
-@property (strong) UIColor *badgeBackgroundColor;
+@property (strong,strong) UIColor *badgeBackgroundColor;
 
 /**
  * Color used for badge's text.
  */
-@property (strong) UIColor *badgeTextColor;
+@property (strong,strong) UIColor *badgeTextColor;
 
 /**
  * The offset for the rectangle around the tab bar item's badge.
  */
-@property (nonatomic) UIOffset badgePositionAdjustment;
+@property UIOffset badgePositionAdjustment;
 
 /**
  * Font used for badge's text.
  */
-@property (nonatomic) UIFont *badgeTextFont;
+@property (nonatomic,strong) UIFont *badgeTextFont;
 
 @end
+

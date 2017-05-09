@@ -28,6 +28,7 @@
 
 @property (nonatomic) CGFloat itemWidth;
 @property (nonatomic) UIView *backgroundView;
+@property (nonatomic) UIView *separatorView;
 
 @end
 
@@ -54,18 +55,29 @@
 }
 
 - (void)commonInitialization {
+    
+    self.backgroundColor = TabbarBackgroundColor;
+    
     _backgroundView = [[UIView alloc] init];
+    _backgroundView.backgroundColor = TabbarBackgroundColor;
     [self addSubview:_backgroundView];
+    
+    _separatorView = [[UIView alloc] init];
+    _separatorView.backgroundColor = TabbarSeparatorColor;
+    [self addSubview:_separatorView];
     
     [self setTranslucent:NO];
 }
 
 - (void)layoutSubviews {
+    
     CGSize frameSize = self.frame.size;
     CGFloat minimumContentHeight = [self minimumContentHeight];
     
     [[self backgroundView] setFrame:CGRectMake(0, frameSize.height - minimumContentHeight,
-                                            frameSize.width, frameSize.height)];
+                                               frameSize.width, frameSize.height)];
+    
+    [[self separatorView] setFrame:CGRectMake(0, 0, frameSize.width, 0.5f)];
     
     [self setItemWidth:roundf((frameSize.width - [self contentEdgeInsets].left -
                                [self contentEdgeInsets].right) / [[self items] count])];
@@ -82,8 +94,9 @@
         }
         
         [item setFrame:CGRectMake(self.contentEdgeInsets.left + (index * self.itemWidth),
-                                  roundf(frameSize.height - itemHeight) - self.contentEdgeInsets.top,
-                                  self.itemWidth, itemHeight - self.contentEdgeInsets.bottom)];
+                                  roundf(frameSize.height - itemHeight) - self.contentEdgeInsets.top + 0.5f,
+                                  self.itemWidth,
+                                  itemHeight - self.contentEdgeInsets.bottom)];
         [item setNeedsDisplay];
         
         index++;
@@ -99,12 +112,12 @@
 }
 
 - (void)setItems:(NSArray *)items {
-    for (RDVTabBarItem *item in _items) {
+    for (RDVTabBarItem *item in items) {
         [item removeFromSuperview];
     }
     
     _items = [items copy];
-    for (RDVTabBarItem *item in _items) {
+    for (RDVTabBarItem *item in items) {
         [item addTarget:self action:@selector(tabBarItemWasSelected:) forControlEvents:UIControlEventTouchDown];
         [self addSubview:item];
     }
@@ -125,7 +138,8 @@
         }
     }
     
-    return minimumTabBarContentHeight;
+    return 49.0f ;
+    //return minimumTabBarContentHeight;
 }
 
 #pragma mark - Item selection
@@ -161,30 +175,8 @@
 - (void)setTranslucent:(BOOL)translucent {
     _translucent = translucent;
     
-    CGFloat alpha = (translucent ? 0.9 : 1.0);
-    
-    [_backgroundView setBackgroundColor:[UIColor colorWithRed:245/255.0
-                                                        green:245/255.0
-                                                         blue:245/255.0
-                                                        alpha:alpha]];
-}
-
-#pragma mark - Accessibility
-
-- (BOOL)isAccessibilityElement{
-    return NO;
-}
-
-- (NSInteger)accessibilityElementCount{
-    return self.items.count;
-}
-
-- (id)accessibilityElementAtIndex:(NSInteger)index{
-    return self.items[index];
-}
-
-- (NSInteger)indexOfAccessibilityElement:(id)element{
-    return [self.items indexOfObject:element];
+    [_backgroundView setBackgroundColor:TabbarBackgroundColor];
 }
 
 @end
+
